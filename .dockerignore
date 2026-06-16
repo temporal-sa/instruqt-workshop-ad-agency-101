@@ -1,0 +1,9 @@
+.git
+.claude
+.venv
+docs
+instruqt
+scripts
+.pytest_cache
+__pycache__
+temporal.db

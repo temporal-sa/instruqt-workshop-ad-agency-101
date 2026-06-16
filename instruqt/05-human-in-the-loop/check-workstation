@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  fail-message "The Temporal dev server isn't running. Start it in the Server tab (the command is in challenge 1)."
+fi
+
+# approval-1: completed APPROVED, with a signal in history
+STATUS=$(temporal workflow describe -w approval-1 -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS" | grep -q "COMPLETED"; then
+  fail-message "approval-1 hasn't completed (status: $STATUS). Start it with a 300s deadline, then send the approve signal before the deadline fires."
+fi
+SIGNALS=$(temporal workflow show -w approval-1 -o json | jq '[.events[] | select(.workflowExecutionSignaledEventAttributes != null)] | length')
+RESULT1=$(temporal workflow show -w approval-1 -o json | jq -r '[.events[] | select(.workflowExecutionCompletedEventAttributes != null)][0].workflowExecutionCompletedEventAttributes.result.payloads[0].data' | base64 -d)
+if [ "$SIGNALS" -lt 1 ] || ! printf '%s' "$RESULT1" | jq -e '.status == "APPROVED"' >/dev/null 2>&1; then
+  fail-message "approval-1 should complete APPROVED via the approve signal (got: $RESULT1). Did the signal handler store the approver on self? Restart your worker after edits."
+fi
+
+# approval-2: completed EXPIRED, with a fired timer in history
+STATUS2=$(temporal workflow describe -w approval-2 -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS2" | grep -q "COMPLETED"; then
+  fail-message "approval-2 hasn't completed (status: $STATUS2). Start it with a 30s deadline and let it expire — don't signal it."
+fi
+TIMERS=$(temporal workflow show -w approval-2 -o json | jq '[.events[] | select(.timerFiredEventAttributes != null)] | length')
+RESULT2=$(temporal workflow show -w approval-2 -o json | jq -r '[.events[] | select(.workflowExecutionCompletedEventAttributes != null)][0].workflowExecutionCompletedEventAttributes.result.payloads[0].data' | base64 -d)
+if [ "$TIMERS" -lt 1 ] || ! printf '%s' "$RESULT2" | jq -e '.status == "EXPIRED"' >/dev/null 2>&1; then
+  fail-message "approval-2 should hit the EXPIRED branch via the durable timer (got: $RESULT2). Check the wait_condition timeout and let the deadline fire without signaling."
+fi
+
+echo "Two fates, one workflow: signaled -> APPROVED, timer fired -> EXPIRED. Human in the loop, done."

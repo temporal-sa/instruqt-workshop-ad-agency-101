@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euxo pipefail
+cd /root/workshop
+
+if ! curl -sf localhost:9999/health >/dev/null 2>&1; then
+  nohup uv run services/adnet.py >/tmp/adnet.log 2>&1 &
+  sleep 2
+fi
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  nohup temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0 \
+    --db-filename /root/workshop/temporal.db >/tmp/temporal.log 2>&1 &
+  for i in $(seq 1 30); do
+    temporal operator cluster health >/dev/null 2>&1 && break
+    sleep 1
+  done
+fi
+
+pkill -f "04-retries-and-errors.*worker.py" || true
+cp -f exercises/04-retries-and-errors/solution/*.py exercises/04-retries-and-errors/practice/
+nohup uv run exercises/04-retries-and-errors/practice/worker.py >/tmp/worker-04.log 2>&1 &
+sleep 3
+
+# Part 1: retries through chaos, then recovery
+curl -sf -X POST localhost:9999/chaos/on
+temporal workflow start --type PublishWorkflow --task-queue publish-tasks \
+  -w publish-1 --input '"pettok"' --id-conflict-policy TerminateExisting
+sleep 8
+curl -sf -X POST localhost:9999/chaos/off
+temporal workflow result -w publish-1
+
+# Part 2: fail fast on dogbook (failure is the expected outcome)
+temporal workflow start --type PublishWorkflow --task-queue publish-tasks \
+  -w publish-3 --input '"dogbook"' --id-conflict-policy TerminateExisting
+temporal workflow result -w publish-3 || true
+
+# Happy-path regression: a healthy channel must still complete
+temporal workflow start --type PublishWorkflow --task-queue publish-tasks \
+  -w publish-ok --input '"meowta"' --id-conflict-policy TerminateExisting
+temporal workflow result -w publish-ok

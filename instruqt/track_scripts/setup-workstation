@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euxo pipefail
+while [ ! -f /opt/instruqt/bootstrap/host-bootstrap-completed ]; do
+    echo "Waiting for Instruqt to finish booting"
+    sleep 1
+done
+echo "cd /root/workshop" >> /root/.bashrc
+
+# Take-home zip server (Download tab, port 8000) — infrastructure, not
+# learner-run, so it lives here rather than in a terminal.
+nohup python3 -m http.server 8000 --directory /root/workshop/dist \
+  >/tmp/download-server.log 2>&1 &

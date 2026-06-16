@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  fail-message "The Temporal dev server isn't running. Start it in the Server tab (the command is in challenge 1)."
+fi
+
+STATUS=$(temporal workflow describe -w social-post-1 -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS" | grep -q "COMPLETED"; then
+  fail-message "No completed execution with ID social-post-1 (status: $STATUS). Is your worker running on 'social-tasks'? If it's stuck Running, open Pending Activities in the UI: 'not registered on this worker' means register the activity (Step 4); a '404 ... /trending/...' with the brand in the URL means you passed BRAND where channel belongs (Step 3). Fix, restart the worker, and terminate + restart the workflow."
+fi
+
+RESULT=$(temporal workflow show -w social-post-1 -o json | jq -r '[.events[] | select(.workflowExecutionCompletedEventAttributes != null)][0].workflowExecutionCompletedEventAttributes.result.payloads[0].data' | base64 -d)
+if ! echo "$RESULT" | grep -q "#"; then
+  fail-message "social-post-1 completed but the post has no hashtags: $RESULT — did fetch_hashtags get called from the workflow and registered with the worker? After fixing, restart the worker and run a fresh execution."
+fi
+
+echo "Post assembled, hashtags and all."

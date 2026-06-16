@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euxo pipefail
+cd /root/workshop
+
+# Ensure services (idempotent; mirrors challenge 1's solve)
+if ! curl -sf localhost:9999/health >/dev/null 2>&1; then
+  nohup uv run services/adnet.py >/tmp/adnet.log 2>&1 &
+  sleep 2
+fi
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  nohup temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0 \
+    --db-filename /root/workshop/temporal.db >/tmp/temporal.log 2>&1 &
+  for i in $(seq 1 30); do
+    temporal operator cluster health >/dev/null 2>&1 && break
+    sleep 1
+  done
+fi
+
+pkill -f "02-first-workflow.*worker.py" || true
+cp -f exercises/02-first-workflow/solution/*.py exercises/02-first-workflow/practice/
+nohup uv run exercises/02-first-workflow/practice/worker.py >/tmp/worker-02.log 2>&1 &
+sleep 3
+
+temporal workflow start --type TaglineWorkflow --task-queue tagline-tasks \
+  -w tagline-1 --input '"CatNip Cola"' --id-conflict-policy TerminateExisting
+temporal workflow result -w tagline-1

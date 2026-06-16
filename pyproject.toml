@@ -1,0 +1,13 @@
+[project]
+name = "temporal-python-workshop"
+version = "0.1.0"
+description = "Durable Python with Temporal - hands-on workshop (CatNip Cola campaign launch)"
+requires-python = ">=3.12"
+dependencies = [
+    "temporalio>=1.9",
+    "flask>=3.0",
+    "requests>=2.32",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]

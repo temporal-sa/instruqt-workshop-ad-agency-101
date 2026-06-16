@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  fail-message "The Temporal dev server isn't running. Start it in the Server tab (the command is in challenge 1)."
+fi
+
+STATUS=$(temporal workflow describe -w tagline-1 -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS" | grep -q "COMPLETED"; then
+  fail-message "No completed execution with ID tagline-1 (status: $STATUS). Is your worker running with task queue 'tagline-tasks'? Did you run the temporal workflow start command from Step 4?"
+fi
+
+RESULT=$(temporal workflow show -w tagline-1 -o json | jq -r '[.events[] | select(.workflowExecutionCompletedEventAttributes != null)][0].workflowExecutionCompletedEventAttributes.result.payloads[0].data' | base64 -d)
+if ! echo "$RESULT" | grep -q "Taste the Meow"; then
+  fail-message "tagline-1 completed, but returned $RESULT — expected the brand, a colon and a space, then 'Taste the Meow!'. Fix the TODO in workflows.py, restart your worker, and start a fresh run (terminate tagline-1 first or reuse the same command)."
+fi
+
+echo "Tagline shipped. Marketing is thrilled."
