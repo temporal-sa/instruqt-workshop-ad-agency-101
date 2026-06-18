@@ -7,7 +7,8 @@ description: |-
   campaign for CatNip Cola, watch a plain Python script lose everything
   mid-launch, then rebuild it as a durable Temporal application: workflows,
   activities, retry policies, error handling - and a finale where you kill
-  the worker mid-run and watch the campaign finish anyway.
+  the worker mid-run and watch the campaign finish anyway. Bonus challenges
+  include human-in-the-loop patterns and connecting it all up to the Temporal Cloud!
 icon: https://temporal.io/images/icons/temporal-logo.svg
 tags:
   - python
