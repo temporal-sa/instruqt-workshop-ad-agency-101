@@ -8,24 +8,36 @@ Temporal bundles Workflow code into an isolated deterministic runtime. A
 Worker polls a Task Queue and runs that code; the Temporal Service never
 runs your application code.
 
+# Step 1: Finish the code
+
+In the [button label="Editor"](tab-0) tab, open
+`02-first-workflow/practice/`:
+
 1. In `practice/workflows.ts`, return
    `` `${brand}: Taste the Meow!` ``.
 2. In `practice/worker.ts`, set `taskQueue` to `tagline-tasks`.
-3. Start the Worker:
 
-```bash
+# Step 2: Start the Worker
+
+In the [button label="Worker"](tab-3) tab:
+
+```bash,run
 npx tsx exercises/02-first-workflow/practice/worker.ts
 ```
 
-In another terminal:
+# Step 3: Start the Workflow
 
-```bash
+In the [button label="CLI"](tab-4) tab:
+
+```bash,run
 temporal workflow start \
   --type taglineWorkflow \
   --task-queue tagline-tasks \
   --workflow-id tagline-1 \
   --input '"CatNip Cola"'
+```
 
+```bash,run
 temporal workflow result -w tagline-1
 ```
 
@@ -33,12 +45,24 @@ The Workflow type is the exported function name. The Task Queue must match
 the Worker exactly. The Workflow ID is the durable business identifier for
 this execution.
 
-## Verify
+# Step 4: Inspect the execution
 
-```bash
+In the [button label="CLI"](tab-4) tab:
+
+```bash,run
 temporal workflow describe -w tagline-1 -o json |
   jq -r '.workflowExecutionInfo.status'
+```
+
+```bash,run
 temporal workflow result -w tagline-1
 ```
 
 Expected result: `"CatNip Cola: Taste the Meow!"`.
+
+Open `tagline-1` in the [button label="Temporal UI"](tab-5) tab and inspect
+its input, result, and Event History. Then hit **Check**.
+
+> [!NOTE]
+> Stuck? Compare with `02-first-workflow/solution/` in the
+> [button label="Editor"](tab-0) tab.

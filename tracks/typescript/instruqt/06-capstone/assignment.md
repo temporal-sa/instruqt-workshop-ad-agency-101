@@ -68,6 +68,10 @@ The TypeScript mapping is:
 | `for` loop | deterministic Workflow orchestration |
 | thrown HTTP error | retryable or non-retryable `ApplicationFailure` |
 
+# Step 1: Build the durable application
+
+Use the [button label="Editor"](tab-0) tab:
+
 1. In `practice/activities.ts`, export the four Activity functions.
 2. In `practice/workflows.ts`, create Activity proxies with ten-second
    start-to-close timeouts. Give `publishToChannel` this retry policy:
@@ -89,12 +93,24 @@ retry: {
 5. In `practice/worker.ts`, replace the empty Activity object with the
    imported `activities` namespace.
 
-Start chaos, then the Worker and Workflow:
+# Step 2: Launch through the outage
 
-```bash
+In the [button label="CLI"](tab-4) tab, turn chaos on:
+
+```bash,run
 curl -X POST localhost:9999/chaos/on
-npx tsx exercises/06-capstone/practice/worker.ts
+```
 
+In the [button label="Worker"](tab-3) tab, stop any previous Worker with
+Ctrl-C, then run:
+
+```bash,run
+npx tsx exercises/06-capstone/practice/worker.ts
+```
+
+In the [button label="CLI"](tab-4) tab:
+
+```bash,run
 temporal workflow start \
   --type campaignWorkflow \
   --task-queue campaign-tasks \
@@ -102,19 +118,45 @@ temporal workflow start \
   --input '"summer-splash"'
 ```
 
-Wait until PetTok is retrying, Ctrl-C the Worker, and inspect the execution:
+# Step 3: Kill the Worker
 
-```bash
+Open `campaign-summer-splash` in the
+[button label="Temporal UI"](tab-5) tab. Wait until PetTok is retrying,
+then go to the [button label="Worker"](tab-3) tab and press Ctrl-C.
+
+Inspect the execution from the [button label="CLI"](tab-4) tab:
+
+```bash,run
 temporal workflow describe -w campaign-summer-splash
 ```
 
-It remains Running. Restart the Worker, recover AdNet, and get the result:
+It remains Running.
 
-```bash
+# Step 4: Recover
+
+Restart the Worker in the [button label="Worker"](tab-3) tab:
+
+```bash,run
+npx tsx exercises/06-capstone/practice/worker.ts
+```
+
+Recover AdNet from the [button label="CLI"](tab-4) tab:
+
+```bash,run
 curl -X POST localhost:9999/chaos/off
+```
+
+```bash,run
 temporal workflow result -w campaign-summer-splash
 ```
 
 Expected: `status` is `LIVE`, `channels_live` is 3, and the budget Activity
 appears exactly once in Event History. Replay restores completed Activity
 results; it does not repeat those side effects after the Worker restarts.
+
+Confirm those events in the [button label="Temporal UI"](tab-5) tab, then
+hit **Check**.
+
+> [!NOTE]
+> Stuck? Compare with `06-capstone/solution/` in the
+> [button label="Editor"](tab-0) tab.

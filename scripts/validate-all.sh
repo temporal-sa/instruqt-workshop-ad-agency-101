@@ -10,6 +10,9 @@ for language in python typescript java; do
   )
 done
 
+echo "==> checking Instruqt assignment interactions"
+node scripts/validate-instruqt-ux.mjs
+
 echo "==> checking TypeScript"
 (
   cd tracks/typescript
