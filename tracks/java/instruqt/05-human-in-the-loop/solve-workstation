@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euxo pipefail
+source /root/workshop/scripts/instruqt-workshop-helpers
+ensure_services
+copy_solution 05-human-in-the-loop
+start_worker 05-human-in-the-loop workshop.ApprovalWorker
+
+temporal workflow start --type CampaignApprovalWorkflow --task-queue approval-tasks \
+  -w approval-1 --input '"summer-splash"' --input '60' \
+  --id-conflict-policy TerminateExisting
+sleep 1
+temporal workflow signal -w approval-1 --name approve --input '"Whiskers LeBlanc"'
+temporal workflow result -w approval-1
+
+temporal workflow start --type CampaignApprovalWorkflow --task-queue approval-tasks \
+  -w approval-2 --input '"summer-splash"' --input '5' \
+  --id-conflict-policy TerminateExisting
+temporal workflow result -w approval-2

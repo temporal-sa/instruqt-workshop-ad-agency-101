@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  fail-message "The Temporal dev server isn't running. Start it in the Server tab (the command is in challenge 1)."
+fi
+
+# publish-1: completed AND survived real failures (more than one attempt)
+STATUS=$(temporal workflow describe -w publish-1 -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS" | grep -q "COMPLETED"; then
+  fail-message "publish-1 hasn't completed (status: $STATUS). Run it against pettok while chaos is on, then 'curl -X POST localhost:9999/chaos/off' and let the retry succeed."
+fi
+MAXATT=$(temporal workflow show -w publish-1 -o json | jq '[.events[].activityTaskStartedEventAttributes.attempt // 0] | max')
+if [ "$MAXATT" -le 1 ]; then
+  fail-message "publish-1 completed on the first attempt — it never hit the outage. Turn chaos on (curl -X POST localhost:9999/chaos/on), terminate publish-1, and re-run it so you can watch real retries."
+fi
+
+# publish-3: failed FAST (exactly one attempt) with the non-retryable error
+STATUS3=$(temporal workflow describe -w publish-3 -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS3" | grep -q "FAILED"; then
+  fail-message "publish-3 should FAIL fast on dogbook (status: $STATUS3). Raise ApplicationFailure.newNonRetryableFailure(..., \"ChannelPolicyError\") for 4xx responses in PublishActivitiesImpl.java, restart your worker, and run publish-3 against dogbook."
+fi
+MAXATT3=$(temporal workflow show -w publish-3 -o json | jq '[.events[].activityTaskStartedEventAttributes.attempt // 0] | max')
+if [ "$MAXATT3" -ne 1 ]; then
+  fail-message "publish-3 failed, but took $MAXATT3 attempts — a non-retryable error should fail on attempt 1. Check that non-retryable failure is set and the worker was restarted after the edit."
+fi
+
+# publish-ok: the happy path must still work after the Part D change
+STATUSOK=$(temporal workflow describe -w publish-ok -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUSOK" | grep -q "COMPLETED"; then
+  MSGOK=$(temporal workflow show -w publish-ok -o json 2>/dev/null | jq -r '[.events[] | select(.workflowExecutionFailedEventAttributes != null)][0].workflowExecutionFailedEventAttributes.failure | (.cause.message // .message // "")' || echo "")
+  if echo "$MSGOK" | grep -q "placement_id"; then
+    fail-message "publish-ok FAILED with a success body inside the error — your 4xx check is matching SUCCESSES. Make sure it reads response.statusCode() >= 400 && response.statusCode() < 500, with the throw inside the if. Fix, restart the worker, and re-run publish-ok."
+  fi
+  fail-message "publish-ok (healthy channel meowta) should still COMPLETE after your Part D change (status: $STATUSOK). Run the publish-ok command from the end of Step 4."
+fi
+
+echo "Retries when it helps, fast failure when it can't — and success still succeeds. That's the whole lesson."

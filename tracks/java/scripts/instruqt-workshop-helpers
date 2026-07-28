@@ -1,0 +1,33 @@
+#!/bin/bash
+
+ensure_services() {
+  cd /root/workshop
+  if ! curl -sf localhost:9999/health >/dev/null 2>&1; then
+    nohup .adnet-venv/bin/python services/adnet.py >/tmp/adnet.log 2>&1 &
+    sleep 2
+  fi
+  if ! temporal operator cluster health >/dev/null 2>&1; then
+    nohup temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0 \
+      --db-filename /root/workshop/temporal.db >/tmp/temporal.log 2>&1 &
+    for _ in $(seq 1 30); do
+      temporal operator cluster health >/dev/null 2>&1 && break
+      sleep 1
+    done
+  fi
+}
+
+copy_solution() {
+  local exercise="$1"
+  cp -Rf "exercises/$exercise/solution/src/main/java/." \
+    "exercises/$exercise/practice/src/main/java/"
+}
+
+start_worker() {
+  local exercise="$1"
+  local main_class="$2"
+  pkill -f "$main_class" || true
+  nohup mvn -q -f "exercises/$exercise/practice/pom.xml" \
+    compile exec:java -Dexec.mainClass="$main_class" \
+    >"/tmp/java-worker-$exercise.log" 2>&1 &
+  sleep 4
+}

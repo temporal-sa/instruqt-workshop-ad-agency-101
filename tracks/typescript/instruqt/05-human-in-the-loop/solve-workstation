@@ -1,0 +1,33 @@
+#!/bin/bash
+set -euxo pipefail
+cd /root/workshop
+
+if ! curl -sf localhost:9999/health >/dev/null 2>&1; then
+  nohup .adnet-venv/bin/python services/adnet.py >/tmp/adnet.log 2>&1 &
+  sleep 2
+fi
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  nohup temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0 \
+    --db-filename /root/workshop/temporal.db >/tmp/temporal.log 2>&1 &
+  for i in $(seq 1 30); do
+    temporal operator cluster health >/dev/null 2>&1 && break
+    sleep 1
+  done
+fi
+
+pkill -f "05-human-in-the-loop.*worker.ts" || true
+cp -f exercises/05-human-in-the-loop/solution/*.ts exercises/05-human-in-the-loop/practice/
+nohup npx tsx exercises/05-human-in-the-loop/practice/worker.ts >/tmp/worker-05.log 2>&1 &
+sleep 3
+
+# Approved branch
+temporal workflow start --type campaignApprovalWorkflow --task-queue approval-tasks \
+  -w approval-1 --input '"summer-splash"' --input '60' --id-conflict-policy TerminateExisting
+sleep 1
+temporal workflow signal -w approval-1 --name approve --input '"Whiskers LeBlanc"'
+temporal workflow result -w approval-1
+
+# Expiry branch
+temporal workflow start --type campaignApprovalWorkflow --task-queue approval-tasks \
+  -w approval-2 --input '"summer-splash"' --input '5' --id-conflict-policy TerminateExisting
+temporal workflow result -w approval-2

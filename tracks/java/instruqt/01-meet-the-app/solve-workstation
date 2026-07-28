@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euxo pipefail
+source /root/workshop/scripts/instruqt-workshop-helpers
+ensure_services
+mvn -q -f exercises/01-meet-the-app/practice/pom.xml \
+  compile exec:java -Dexec.mainClass=workshop.CampaignApp || true

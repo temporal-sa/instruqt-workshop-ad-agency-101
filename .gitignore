@@ -1,7 +1,12 @@
+.DS_Store
+node_modules/
+target/
 .venv/
+.adnet-venv/
+.pytest_cache/
 __pycache__/
 *.pyc
 temporal.db
-nohup.out
 history.json
-.pytest_cache/
+dist/
+*.log

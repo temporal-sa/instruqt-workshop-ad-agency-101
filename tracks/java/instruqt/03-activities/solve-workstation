@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euxo pipefail
+source /root/workshop/scripts/instruqt-workshop-helpers
+ensure_services
+copy_solution 03-activities
+start_worker 03-activities workshop.SocialPostWorker
+temporal workflow start --type SocialPostWorkflow --task-queue social-tasks \
+  -w social-post-1 --input '"catstagram"' --id-conflict-policy TerminateExisting
+temporal workflow result -w social-post-1

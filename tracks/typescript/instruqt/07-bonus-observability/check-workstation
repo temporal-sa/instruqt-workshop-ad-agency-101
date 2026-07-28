@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+# Lenient by design: this is the bonus challenge and must never block anyone.
+if [ ! -f exercises/07-bonus-observability/history.json ]; then
+  fail-message "history.json not found. Export it first:  temporal workflow show -w campaign-summer-splash -o json > exercises/07-bonus-observability/history.json"
+fi
+
+echo "History exported. If replay.ts printed 'Replay OK', you've closed the loop: code <-> history."

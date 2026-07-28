@@ -1,0 +1,23 @@
+#!/bin/bash
+set -euxo pipefail
+source /root/workshop/scripts/instruqt-workshop-helpers
+ensure_services
+
+status=$(temporal workflow describe -w campaign-summer-splash -o json 2>/dev/null |
+  jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$status" | grep -q "COMPLETED"; then
+  copy_solution 06-capstone
+  start_worker 06-capstone workshop.CampaignWorker
+  curl -sf -X POST localhost:9999/chaos/on
+  temporal workflow start --type CampaignWorkflow --task-queue campaign-tasks \
+    -w campaign-summer-splash --input '"summer-splash"' \
+    --id-conflict-policy TerminateExisting
+  sleep 8
+  curl -sf -X POST localhost:9999/chaos/off
+  temporal workflow result -w campaign-summer-splash
+fi
+
+temporal workflow show -w campaign-summer-splash -o json \
+  > exercises/07-bonus-observability/history.json
+mvn -q -f exercises/07-bonus-observability/pom.xml \
+  compile exec:java -Dexec.mainClass=workshop.Replay

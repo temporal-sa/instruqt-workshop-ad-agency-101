@@ -1,0 +1,10 @@
+version: "3"
+containers:
+- name: workstation
+  # Replace this before the first platform deployment. See DEPLOY.md.
+  image: REGISTRY_PLACEHOLDER/temporal-typescript-workshop:v1
+  shell: /bin/bash
+  ports:
+  - 8233
+  - 8000
+  memory: 3072

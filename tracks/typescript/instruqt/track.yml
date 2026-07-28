@@ -1,0 +1,31 @@
+slug: durable-ad-campaign-typescript-workshop
+title: Durable Ad Campaign Roll-Out (TypeScript) with Temporal
+teaser: Take CatNip Cola's ad campaign from fragile script to durable workflow.
+description: |-
+  A hands-on introduction to Temporal with TypeScript. You will launch an ad
+  campaign for CatNip Cola, watch a plain TypeScript script lose everything
+  mid-launch, then rebuild it as a durable Temporal application: workflows,
+  activities, retry policies, error handling - and a finale where you kill
+  the worker mid-run and watch the campaign finish anyway. Bonus challenges
+  include human-in-the-loop patterns and connecting it all up to the Temporal Cloud!
+icon: https://temporal.io/images/icons/temporal-logo.svg
+tags:
+  - typescript
+  - temporal
+  - adcampaign
+owner: temporal
+developers:
+  - michael.jones@temporal.io
+show_timer: true
+skipping_enabled: true
+idle_timeout: 3600
+timelimit: 10800
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages: true
+  hideStopButton: false
+  default_layout: AssignmentLeft
+  default_layout_sidebar_size: 33
+enhanced_loading: false

@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+if ! curl -sf localhost:9999/health >/dev/null 2>&1; then
+  fail-message "AdNet isn't running. Start it in the AdNet tab:  .adnet-venv/bin/python services/adnet.py"
+fi
+
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  fail-message "The Temporal dev server isn't running. Start it in the Server tab:  temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0 --db-filename temporal.db"
+fi
+
+echo "Both services are up. On to your first workflow."

@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euxo pipefail
+source /root/workshop/scripts/instruqt-workshop-helpers
+ensure_services
+copy_solution 04-retries-and-errors
+start_worker 04-retries-and-errors workshop.PublishWorker
+
+curl -sf -X POST localhost:9999/chaos/on
+temporal workflow start --type PublishWorkflow --task-queue publish-tasks \
+  -w publish-1 --input '"pettok"' --id-conflict-policy TerminateExisting
+sleep 8
+curl -sf -X POST localhost:9999/chaos/off
+temporal workflow result -w publish-1
+
+temporal workflow start --type PublishWorkflow --task-queue publish-tasks \
+  -w publish-3 --input '"dogbook"' --id-conflict-policy TerminateExisting
+temporal workflow result -w publish-3 || true
+temporal workflow start --type PublishWorkflow --task-queue publish-tasks \
+  -w publish-ok --input '"meowta"' --id-conflict-policy TerminateExisting
+temporal workflow result -w publish-ok

@@ -1,0 +1,30 @@
+#!/bin/bash
+set -euo pipefail
+cd /root/workshop
+
+if ! temporal operator cluster health >/dev/null 2>&1; then
+  fail-message "The Temporal dev server isn't running. Start it in the Server tab (the command is in challenge 1)."
+fi
+
+STATUS=$(temporal workflow describe -w campaign-summer-splash -o json 2>/dev/null | jq -r '.workflowExecutionInfo.status' || echo "NOT_FOUND")
+if ! echo "$STATUS" | grep -q "COMPLETED"; then
+  if echo "$STATUS" | grep -q "FAILED"; then
+    MSG=$(temporal workflow show -w campaign-summer-splash -o json 2>/dev/null | jq -r '[.events[] | select(.workflowExecutionFailedEventAttributes != null)][0].workflowExecutionFailedEventAttributes.failure | (.cause.message // .message // "")' || echo "")
+    if echo "$MSG" | grep -q "placement_id"; then
+      fail-message "The campaign FAILED with a success body inside a 'rejected' error — your 4xx check in publishToChannel is matching SUCCESSES. Make sure it reads response.status() >= 400 and response.status() < 500 (not 400 >=) with the raise inside the if. Fix, restart the worker, and launch again."
+    fi
+  fi
+  fail-message "campaign-summer-splash hasn't completed (status: $STATUS). If it's Running, is your worker up? Is chaos still on? (curl -X POST localhost:9999/chaos/off ends the outage.)"
+fi
+
+REPORT=$(temporal workflow show -w campaign-summer-splash -o json | jq -r '[.events[] | select(.workflowExecutionCompletedEventAttributes != null)][0].workflowExecutionCompletedEventAttributes.result.payloads[0].data' | base64 -d)
+if ! printf '%s' "$REPORT" | jq -e '.status == "LIVE" and .channels_live == 3 and all(.placements[]; . != null)' >/dev/null 2>&1; then
+  fail-message "The launch report isn't right: $REPORT — expected status LIVE, 3 channels, and 3 non-null placement ids. Null placements usually mean an Activity method returned null instead of its result. Fix, restart the worker, and launch again."
+fi
+
+MAXATT=$(temporal workflow show -w campaign-summer-splash -o json | jq '[.events[].activityTaskStartedEventAttributes.attempt // 0] | max')
+if [ "$MAXATT" -le 1 ]; then
+  fail-message "The campaign completed, but on a clean first try — it never met the outage, so you haven't seen durability earn its keep. Turn chaos on (curl -X POST localhost:9999/chaos/on), terminate the workflow, and launch again through the fire."
+fi
+
+echo "Campaign LIVE on 3 channels, straight through an outage and a worker kill. That's durable execution."
