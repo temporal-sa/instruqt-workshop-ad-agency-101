@@ -23,7 +23,8 @@ public class SocialPostWorkflowImpl implements SocialPostWorkflow {
   @Override
   public String createPost(String channel) {
     String tagline = taglineActivities.generateTagline(BRAND);
-    // TODO: Part C — call hashtagActivities.fetchHashtags(channel).
+    // TODO: Part C — use the typed stub defined above:
+    // List<String> hashtags = hashtagActivities.fetchHashtags(channel);
     List<String> hashtags = List.of();
     return tagline + " " + String.join(" ", hashtags);
   }

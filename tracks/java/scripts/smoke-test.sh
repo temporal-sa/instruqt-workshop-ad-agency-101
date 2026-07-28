@@ -103,6 +103,9 @@ temporal workflow execute --type SocialPostWorkflow --task-queue social-tasks \
   -w smoke-java-social --input '"catstagram"' \
   --id-conflict-policy TerminateExisting >/dev/null
 result_of smoke-java-social | grep -q "#CatsOfCatstagram" || fail "exercise 03 result"
+hashtag_count="$(temporal workflow show -w smoke-java-social -o json |
+  jq '[.events[] | select(.activityTaskScheduledEventAttributes.activityType.name == "FetchHashtags")] | length')"
+[ "$hashtag_count" -eq 1 ] || fail "exercise 03 must schedule FetchHashtags"
 stop_worker
 
 echo "==> exercise 04"

@@ -72,16 +72,67 @@ HashtagActivities activities =
             .build());
 ```
 
-# Step 1: Complete and register the Activity
+# Step 1: Trace the worked Activity
 
-In the [button label="Editor"](tab-0) tab:
+In the [button label="Editor"](tab-0) tab, open
+`03-activities/practice/`:
 
-1. Implement `HashtagActivitiesImpl.fetchHashtags`: GET
-   `/trending/<channel>`, decode JSON, and return the hashtag list.
-2. In `SocialPostWorkflowImpl`, call it with the incoming channel.
-3. In `SocialPostWorker`, register `new HashtagActivitiesImpl()`.
+- `TaglineActivities` defines the Activity contract.
+- `TaglineActivitiesImpl` performs the AdNet request.
+- `SocialPostWorkflowImpl` creates a typed `taglineActivities` stub and
+  calls `generateTagline`.
+- `SocialPostWorker` registers `new TaglineActivitiesImpl()`.
 
-# Step 2: Start the Worker
+That is the complete path: Activity interface → implementation → typed
+Workflow stub → Worker registration.
+
+# Step 2: Complete `fetchHashtags`
+
+In `HashtagActivitiesImpl.java`, finish `fetchHashtags`. The HTTP request
+and JSON decoding are already provided. Read `hashtags` from the decoded
+map and return it:
+
+```java
+@SuppressWarnings("unchecked")
+List<String> hashtags = (List<String>) body.get("hashtags");
+return hashtags;
+```
+
+# Step 3: Call the Activity from the Workflow
+
+Open `SocialPostWorkflowImpl.java`. The `hashtagActivities` typed stub is
+already scaffolded above `createPost`. Inside `createPost`, replace the
+empty list:
+
+```java
+List<String> hashtags = List.of();
+```
+
+with the Activity call:
+
+```java
+List<String> hashtags = hashtagActivities.fetchHashtags(channel);
+```
+
+This does not call `HashtagActivitiesImpl` directly. The typed stub tells
+Temporal to schedule a `fetchHashtags` Activity Task and wait durably for
+its result.
+
+# Step 4: Register the implementation
+
+Open `SocialPostWorker.java` and add the new implementation to the existing
+registration:
+
+```java
+worker.registerActivitiesImplementations(
+    new TaglineActivitiesImpl(),
+    new HashtagActivitiesImpl());
+```
+
+The Workflow stub schedules the task; this registered implementation is
+what lets the Worker execute it.
+
+# Step 5: Start the Worker
 
 In the [button label="Worker"](tab-3) tab, stop any previous Worker with
 Ctrl-C, then run:
@@ -91,7 +142,7 @@ mvn -q -f exercises/03-activities/practice/pom.xml \
   compile exec:java -Dexec.mainClass=workshop.SocialPostWorker
 ```
 
-# Step 3: Start the Workflow
+# Step 6: Start the Workflow
 
 In the [button label="CLI"](tab-4) tab:
 

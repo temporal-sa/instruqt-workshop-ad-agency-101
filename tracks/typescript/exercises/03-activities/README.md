@@ -19,17 +19,63 @@ const { fetchHashtags } = proxyActivities<typeof activities>({
 The `import type` is important: it keeps Node.js Activity implementation
 code out of the Workflow sandbox.
 
-# Step 1: Complete and register the Activity
+# Step 1: Trace the worked Activity
 
-In the [button label="Editor"](tab-0) tab:
+In the [button label="Editor"](tab-0) tab, open
+`03-activities/practice/`:
 
-1. In `practice/activities.ts`, export `fetchHashtags(channel)`. GET
-   `http://localhost:9999/trending/<channel>` and return `body.hashtags`.
-2. In `practice/workflows.ts`, include `fetchHashtags` in the typed proxy
-   and await it for the requested channel.
-3. In `practice/worker.ts`, import and register `fetchHashtags`.
+- `activities.ts` contains the worked `generateTagline` Activity.
+- `workflows.ts` includes `generateTagline` in a typed Activity proxy and
+  awaits it.
+- `worker.ts` registers `generateTagline` with the Worker.
 
-# Step 2: Start the Worker
+That is the complete path: Activity function → typed Workflow proxy →
+Worker registration.
+
+# Step 2: Implement `fetchHashtags`
+
+In `activities.ts`, export an async `fetchHashtags(channel)` Activity. Fetch
+`/trending/<channel>` and return the decoded hashtag list:
+
+```ts
+export async function fetchHashtags(channel: string): Promise<string[]> {
+  const body = await getJson(`/trending/${channel}`);
+  return body.hashtags as string[];
+}
+```
+
+# Step 3: Call the Activity from the Workflow
+
+In `workflows.ts`, add `fetchHashtags` to the existing typed proxy:
+
+```ts
+const { generateTagline, fetchHashtags } =
+  proxyActivities<typeof activities>({
+    startToCloseTimeout: '10 seconds',
+  });
+```
+
+Then replace the empty hashtag list inside `socialPostWorkflow` with:
+
+```ts
+const hashtags = await fetchHashtags(channel);
+```
+
+The proxy schedules an Activity Task; it does not call the networked
+implementation inside the Workflow sandbox.
+
+# Step 4: Register the Activity
+
+In `worker.ts`, import and register both Activity implementations:
+
+```ts
+import * as activities from './activities';
+
+// Inside Worker.create:
+activities,
+```
+
+# Step 5: Start the Worker
 
 In the [button label="Worker"](tab-3) tab, stop any previous Worker with
 Ctrl-C, then run:
@@ -38,7 +84,7 @@ Ctrl-C, then run:
 npx tsx exercises/03-activities/practice/worker.ts
 ```
 
-# Step 3: Start the Workflow
+# Step 6: Start the Workflow
 
 In the [button label="CLI"](tab-4) tab:
 

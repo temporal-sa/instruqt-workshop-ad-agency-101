@@ -16,4 +16,10 @@ if ! echo "$RESULT" | grep -q "#"; then
   fail-message "social-post-1 completed but the post has no hashtags: $RESULT — did fetchHashtags get called from the workflow and registered with the worker? After fixing, restart the worker and run a fresh execution."
 fi
 
+HASHTAG_ACTIVITY_COUNT=$(temporal workflow show -w social-post-1 -o json |
+  jq '[.events[] | select(.activityTaskScheduledEventAttributes.activityType.name == "fetchHashtags")] | length')
+if [ "$HASHTAG_ACTIVITY_COUNT" -ne 1 ]; then
+  fail-message "The result contains hashtags, but Event History does not contain the fetchHashtags Activity. Complete Step 3 by awaiting fetchHashtags(channel) from socialPostWorkflow, then run a fresh execution."
+fi
+
 echo "Post assembled, hashtags and all."
