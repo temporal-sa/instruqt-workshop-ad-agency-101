@@ -1,0 +1,21 @@
+# The same Worker as exercise 2, connected to Temporal Cloud.
+# Only the connection changes: address and namespace come from the
+# environment, and the tls section turns on TLS with the system CA roots.
+# The API key is not stored here; worker.php hands it to RoadRunner.
+version: "3"
+
+rpc:
+  listen: tcp://127.0.0.1:6001
+
+server:
+  command: "php worker.php"
+
+temporal:
+  address: ${TEMPORAL_ADDRESS}
+  namespace: ${TEMPORAL_NAMESPACE}
+  tls:
+    # Empty: verify the server against its own host name.
+    server_name: ""
+
+logs:
+  level: info

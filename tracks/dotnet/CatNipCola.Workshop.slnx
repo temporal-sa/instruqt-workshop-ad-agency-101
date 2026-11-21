@@ -1,0 +1,41 @@
+<Solution>
+  <Folder Name="/01-meet-the-app/practice/">
+    <Project Path="exercises/01-meet-the-app/practice/CampaignApp.csproj" />
+  </Folder>
+  <Folder Name="/02-first-workflow/practice/">
+    <Project Path="exercises/02-first-workflow/practice/TaglineWorker.csproj" />
+  </Folder>
+  <Folder Name="/02-first-workflow/solution/">
+    <Project Path="exercises/02-first-workflow/solution/TaglineWorker.csproj" />
+  </Folder>
+  <Folder Name="/03-activities/practice/">
+    <Project Path="exercises/03-activities/practice/SocialPostWorker.csproj" />
+  </Folder>
+  <Folder Name="/03-activities/solution/">
+    <Project Path="exercises/03-activities/solution/SocialPostWorker.csproj" />
+  </Folder>
+  <Folder Name="/04-retries-and-errors/practice/">
+    <Project Path="exercises/04-retries-and-errors/practice/PublishWorker.csproj" />
+  </Folder>
+  <Folder Name="/04-retries-and-errors/solution/">
+    <Project Path="exercises/04-retries-and-errors/solution/PublishWorker.csproj" />
+  </Folder>
+  <Folder Name="/05-human-in-the-loop/practice/">
+    <Project Path="exercises/05-human-in-the-loop/practice/ApprovalWorker.csproj" />
+  </Folder>
+  <Folder Name="/05-human-in-the-loop/solution/">
+    <Project Path="exercises/05-human-in-the-loop/solution/ApprovalWorker.csproj" />
+  </Folder>
+  <Folder Name="/06-capstone/practice/">
+    <Project Path="exercises/06-capstone/practice/CampaignWorker.csproj" />
+  </Folder>
+  <Folder Name="/06-capstone/solution/">
+    <Project Path="exercises/06-capstone/solution/CampaignWorker.csproj" />
+  </Folder>
+  <Folder Name="/07-bonus-observability/">
+    <Project Path="exercises/07-bonus-observability/Replay.csproj" />
+  </Folder>
+  <Folder Name="/08-to-the-cloud/">
+    <Project Path="exercises/08-to-the-cloud/CloudWorker.csproj" />
+  </Folder>
+</Solution>

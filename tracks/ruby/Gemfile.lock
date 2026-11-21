@@ -1,0 +1,102 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bigdecimal (4.1.3)
+    google-protobuf (4.36.2)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-aarch64-linux-gnu)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-aarch64-linux-musl)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-arm64-darwin)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-x86-linux-gnu)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-x86-linux-musl)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-x86_64-darwin)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-x86_64-linux-gnu)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.36.2-x86_64-linux-musl)
+      bigdecimal
+      rake (~> 13.3)
+    json (2.21.2)
+    logger (1.7.0)
+    rake (13.4.2)
+    temporalio (1.11.0)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+    temporalio (1.11.0-aarch64-linux)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+    temporalio (1.11.0-aarch64-linux-musl)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+    temporalio (1.11.0-arm64-darwin)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+    temporalio (1.11.0-x86_64-darwin)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+    temporalio (1.11.0-x86_64-linux)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+    temporalio (1.11.0-x86_64-linux-musl)
+      google-protobuf (>= 3.25.0)
+      json (< 3)
+      logger
+
+PLATFORMS
+  aarch64-linux
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm64-darwin
+  ruby
+  x86-linux-gnu
+  x86-linux-musl
+  x86_64-darwin
+  x86_64-linux-gnu
+  x86_64-linux-musl
+
+DEPENDENCIES
+  temporalio (= 1.11.0)
+
+CHECKSUMS
+  bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
+  google-protobuf (4.36.2) sha256=2f8daff50ae14aad36ab0ccdcf284065fa71d726c444efe114e6db82ffe62494
+  google-protobuf (4.36.2-aarch64-linux-gnu) sha256=c3279ec6eaa59f6ed6276eda2a33cffb4306471183ab79a332e698b8564f5169
+  google-protobuf (4.36.2-aarch64-linux-musl) sha256=0772c9dde1e6dce9a6b44d1d35c28c29adee99d9bd6aff5e21840daeb22161ce
+  google-protobuf (4.36.2-arm64-darwin) sha256=f70d810e6bbab9d8ad9c1d5fd685a21de4c10ad3ad32efb9455e17e5b1286917
+  google-protobuf (4.36.2-x86-linux-gnu) sha256=ffcd06d49bffca24afff18c900dd61a51ea3028d43c47d0d9621d00bf38a5866
+  google-protobuf (4.36.2-x86-linux-musl) sha256=e1afec03babd73c9117cc09d5fc2a98dfef37a414bfd8a4d0ceaac7bd66fc028
+  google-protobuf (4.36.2-x86_64-darwin) sha256=8d1bd2a344f7f589703b202ad2ee4cca8ef731b4ced45782ef92d385967384ba
+  google-protobuf (4.36.2-x86_64-linux-gnu) sha256=d25a820873e423f1d209ae8c672a4a28b019e2429debd0901d26670a0b4e14db
+  google-protobuf (4.36.2-x86_64-linux-musl) sha256=0fa17686c896da96a60a705e56ddc7d4ff56413f52787c655bd4c9fb33ffe14f
+  json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
+  logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+  rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+  temporalio (1.11.0) sha256=97938da91b88429e2a1522da013fcf94b5de0725a83164c12429d3ed4b73534b
+  temporalio (1.11.0-aarch64-linux) sha256=d2e504944bcacda29247e3ad0f22b700bc61ea1f2b93b10272e3b17ff927612b
+  temporalio (1.11.0-aarch64-linux-musl) sha256=dcc8a5c3d264b9d5da3acf80bdf15d64a7e59c85c8969284fbee94ba730c82a8
+  temporalio (1.11.0-arm64-darwin) sha256=9f39428846642bdf9cfccaa03536c887f1421d9d5e6c589caf11eb7047a75d9b
+  temporalio (1.11.0-x86_64-darwin) sha256=a65ec9f1cf2eaad78834f4c74b704d70ca8d1b2e21c51496d4e3876c0405d22a
+  temporalio (1.11.0-x86_64-linux) sha256=fbfdc552d91a45cfe1e184307c309134a3f20bff777f11c027ed249d843247fd
+  temporalio (1.11.0-x86_64-linux-musl) sha256=32c54c685dbf28a8f7f6051ad8d7457244fca7f9e28e7306b9b1a3ff7fa1ac20
+
+BUNDLED WITH
+  4.0.20

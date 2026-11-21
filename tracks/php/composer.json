@@ -1,0 +1,18 @@
+{
+    "name": "temporal-workshop/php-ad-campaign",
+    "description": "Durable PHP with Temporal — the CatNip Cola workshop",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-sockets": "*",
+        "temporal/sdk": "2.20.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "check": "php scripts/check.php"
+    }
+}

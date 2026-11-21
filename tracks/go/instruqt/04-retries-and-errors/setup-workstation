@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euxo pipefail
+# Make sure chaos is ON for this challenge's failure demos (the learner may
+# have turned it off earlier). Ignore failure: if AdNet isn't up yet it boots
+# with chaos on anyway.
+curl -sf -X POST localhost:9999/chaos/on || true

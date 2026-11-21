@@ -6,7 +6,7 @@
  * lifecycle scripts remain owned by the Instruqt directory.
  *
  * Usage:
- *   node scripts/sync-instruqt-content.mjs typescript java
+ *   node scripts/sync-instruqt-content.mjs typescript java go dotnet php ruby rust
  */
 
 import { readFile, writeFile } from 'node:fs/promises';
@@ -16,7 +16,7 @@ const root = resolve(import.meta.dirname, '..');
 const languages = process.argv.slice(2);
 
 if (languages.length === 0) {
-  throw new Error('Pass one or more track directories: python, typescript, java');
+  throw new Error('Pass one or more track directories: typescript, java, go, dotnet, php, ruby, rust');
 }
 
 for (const language of languages) {
