@@ -1,0 +1,5 @@
+target/
+.adnet-venv/
+dist/
+temporal.db
+exercises/07-bonus-observability/history.json

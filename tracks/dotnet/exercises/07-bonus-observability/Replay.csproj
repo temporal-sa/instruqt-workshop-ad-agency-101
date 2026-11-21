@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Temporalio" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Replay the learner's current capstone Workflow code (not the solution). -->
+    <Compile Include="../06-capstone/practice/*.cs" Exclude="../06-capstone/practice/Program.cs" />
+  </ItemGroup>
+</Project>

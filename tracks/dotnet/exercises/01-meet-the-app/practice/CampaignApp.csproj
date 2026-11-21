@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- A plain .NET console app. No Temporal here (yet). -->
+</Project>

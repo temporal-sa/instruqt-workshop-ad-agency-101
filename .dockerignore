@@ -8,3 +8,6 @@
 **/temporal.db
 **/history.json
 **/dist
+**/bin
+**/obj
+**/vendor

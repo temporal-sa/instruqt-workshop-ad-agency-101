@@ -1,0 +1,18 @@
+# RoadRunner configuration for the replay host started by replay.php.
+# It uses its own RPC port, so it can run next to your capstone Worker.
+version: "3"
+
+rpc:
+  listen: tcp://127.0.0.1:6002
+
+server:
+  command: "php replay-worker.php"
+
+temporal:
+  address: ${TEMPORAL_ADDRESS:-127.0.0.1:7233}
+  namespace: default
+  # Replay needs Workflow code only; never run real Activities here.
+  disable_activity_workers: true
+
+logs:
+  level: warn

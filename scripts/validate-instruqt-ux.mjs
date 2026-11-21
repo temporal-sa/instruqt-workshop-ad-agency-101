@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const languages = ['typescript', 'java'];
+const languages = ['typescript', 'java', 'go', 'dotnet', 'php', 'ruby', 'rust'];
 const challenges = [
   '01-meet-the-app',
   '02-first-workflow',
@@ -46,7 +46,12 @@ function expectedCommandTab(command) {
   }
   if (
     command.includes('/worker.ts') ||
-    /-Dexec\.mainClass=workshop\.\w*Worker/.test(command)
+    /-Dexec\.mainClass=workshop\.\w*Worker/.test(command) ||
+    /\bgo run \.\/exercises\/\S+\/worker\b/.test(command) ||
+    command.includes('Worker.csproj') ||
+    command.includes('rr serve') ||
+    command.includes('/worker.rb') ||
+    /cargo run [^\n]*--bin [\w-]*worker\b/.test(command)
   ) {
     return 'Worker';
   }

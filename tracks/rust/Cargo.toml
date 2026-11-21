@@ -1,0 +1,94 @@
+# One Cargo package for the whole workshop. Every exercise program is a
+# separate binary target, so dependencies compile once into the shared
+# target/ directory and each `cargo run --bin <name>` rebuilds only that
+# exercise's files.
+[package]
+name = "catnip-cola-workshop"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.92"
+publish = false
+description = "Durable Rust with Temporal: the CatNip Cola workshop"
+
+[dependencies]
+futures = "0.3.34"
+reqwest = { version = "0.13.5", default-features = false, features = ["json"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+temporalio-client = "1.2.0"
+temporalio-common = "1.2.0"
+temporalio-macros = "1.2.0"
+temporalio-sdk = "1.2.0"
+temporalio-workflow = "1.2.0"
+tokio = { version = "1.54.1", features = ["full"] }
+
+# Debug builds without debug info or symbols link faster and keep the
+# workstation image small. Each exercise binary is a small crate, so
+# incremental compilation buys little and costs disk space.
+[profile.dev]
+debug = false
+strip = true
+incremental = false
+
+[profile.dev.package."*"]
+debug = false
+
+# Exercise 1: the fragile, non-Temporal launcher
+[[bin]]
+name = "campaign-app"
+path = "exercises/01-meet-the-app/practice/app.rs"
+
+# Exercise 2
+[[bin]]
+name = "tagline-worker"
+path = "exercises/02-first-workflow/practice/worker.rs"
+
+[[bin]]
+name = "tagline-worker-solution"
+path = "exercises/02-first-workflow/solution/worker.rs"
+
+# Exercise 3
+[[bin]]
+name = "social-post-worker"
+path = "exercises/03-activities/practice/worker.rs"
+
+[[bin]]
+name = "social-post-worker-solution"
+path = "exercises/03-activities/solution/worker.rs"
+
+# Exercise 4
+[[bin]]
+name = "publish-worker"
+path = "exercises/04-retries-and-errors/practice/worker.rs"
+
+[[bin]]
+name = "publish-worker-solution"
+path = "exercises/04-retries-and-errors/solution/worker.rs"
+
+# Exercise 5
+[[bin]]
+name = "approval-worker"
+path = "exercises/05-human-in-the-loop/practice/worker.rs"
+
+[[bin]]
+name = "approval-worker-solution"
+path = "exercises/05-human-in-the-loop/solution/worker.rs"
+
+# Exercise 6
+[[bin]]
+name = "campaign-worker"
+path = "exercises/06-capstone/practice/worker.rs"
+
+[[bin]]
+name = "campaign-worker-solution"
+path = "exercises/06-capstone/solution/worker.rs"
+
+# Exercise 7: replays exercise 6's practice Workflow
+[[bin]]
+name = "replay"
+path = "exercises/07-bonus-observability/replay.rs"
+
+# Exercise 8: the exercise 2 Workflow on Temporal Cloud
+[[bin]]
+name = "cloud-worker"
+path = "exercises/08-to-the-cloud/worker.rs"

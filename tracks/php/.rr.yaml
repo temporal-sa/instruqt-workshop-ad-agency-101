@@ -1,0 +1,24 @@
+# RoadRunner configuration for every local Worker in this workshop.
+#
+# RoadRunner embeds the Temporal Go SDK: it connects to the Temporal Service,
+# polls the Task Queues your PHP worker.php registers, and runs that PHP
+# script as a pool of worker processes. Each exercise picks its worker.php
+# with an override, for example:
+#
+#   rr serve -o server.command="php exercises/02-first-workflow/practice/worker.php"
+version: "3"
+
+rpc:
+  listen: tcp://127.0.0.1:6001
+
+server:
+  command: "php exercises/02-first-workflow/practice/worker.php"
+
+temporal:
+  address: ${TEMPORAL_ADDRESS:-127.0.0.1:7233}
+  namespace: default
+  activities:
+    num_workers: 2
+
+logs:
+  level: info

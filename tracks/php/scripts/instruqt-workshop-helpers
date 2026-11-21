@@ -1,0 +1,50 @@
+#!/bin/bash
+# Shared helpers for the PHP track's Instruqt lifecycle scripts.
+
+ensure_services() {
+  cd /root/workshop
+  if ! curl -sf localhost:9999/health >/dev/null 2>&1; then
+    nohup .adnet-venv/bin/python services/adnet.py >/tmp/adnet.log 2>&1 &
+    sleep 2
+  fi
+  if ! temporal operator cluster health >/dev/null 2>&1; then
+    nohup temporal server start-dev --ip 0.0.0.0 --ui-ip 0.0.0.0 \
+      --db-filename /root/workshop/temporal.db >/tmp/temporal.log 2>&1 &
+    for _ in $(seq 1 30); do
+      temporal operator cluster health >/dev/null 2>&1 && break
+      sleep 1
+    done
+  fi
+}
+
+copy_solution() {
+  local exercise="$1"
+  cp -f "exercises/$exercise/solution/"*.php "exercises/$exercise/practice/"
+}
+
+# Every local Worker shares RoadRunner's RPC port, so stop any running Worker
+# (including one in the learner's Worker tab) before starting another.
+stop_workers() {
+  pkill -f "rr serve -o server.command=" || true
+  for _ in $(seq 1 20); do
+    pgrep -f "rr serve -o server.command=" >/dev/null || return 0
+    sleep 0.5
+  done
+  pkill -9 -f "rr serve -o server.command=" || true
+  pkill -9 -f "exercises/.*/worker.php" || true
+  sleep 1
+}
+
+start_worker() {
+  local exercise="$1"
+  local log="/tmp/php-worker-$exercise.log"
+  stop_workers
+  nohup rr serve -o server.command="php exercises/$exercise/practice/worker.php" \
+    >"$log" 2>&1 &
+  for _ in $(seq 1 40); do
+    grep -q "RoadRunner server started" "$log" && return 0
+    sleep 0.5
+  done
+  echo "Worker for $exercise did not start; see $log" >&2
+  return 1
+}

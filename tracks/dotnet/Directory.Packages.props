@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Temporalio" Version="1.22.0" />
+  </ItemGroup>
+</Project>

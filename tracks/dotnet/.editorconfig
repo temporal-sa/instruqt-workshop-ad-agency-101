@@ -1,0 +1,16 @@
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+# Workflow code intentionally breaks a few general-purpose .NET analyzer rules.
+[*.workflow.cs]
+dotnet_diagnostic.CA1024.severity = none
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA2008.severity = none
+dotnet_diagnostic.CA5394.severity = none
+dotnet_diagnostic.CS1998.severity = none
+dotnet_diagnostic.VSTHRD103.severity = none
+dotnet_diagnostic.VSTHRD105.severity = none
